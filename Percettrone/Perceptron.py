@@ -3,9 +3,14 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Perceptron class
+# Perceptron class, il percettrone è un classificatore binario lineare
+# che permette di classificare un insieme di dati in due classi distinte da una retta
+# (o iperpiano) definita da un vettore di pesi w e un termine di bias b. Se il prodotto
+# scalare tra il vettore di pesi e il vettore di input è maggiore di una soglia, il percettrone
+# classifica l'input come appartenente alla classe 1, altrimenti come appartenente alla classe -1.
+
 class Perceptron(object):
-    def __init__(self, eta=0.01, n_iter=10, random_state=1):
+    def __init__(self, eta=0.01, n_iter=50, random_state=1):
         self.eta = eta
         self.n_iter = n_iter
         self.random_state = random_state
@@ -14,9 +19,12 @@ class Perceptron(object):
         rgen = np.random.RandomState(self.random_state)
         self.w_ = rgen.normal(loc=0.0, scale=0.01, size=1 + X.shape[1])
         self.errors_ = []
-
+        #viene usando il metodo zip per iterare su due liste contemporaneamente, questo permette di
+        #implementare la backpropagation in modo più efficiente e veloce, in quanto si aggiornano i pesi (la back propagation consisterà nel calcolare l'errore rispetto al target e aggiornare i pesi)
+        #dopo ogni iterazione.
         for _ in range(self.n_iter):
             errors = 0
+            print('epoch:', _)
             for xi, target in zip(X, y):
                 update = self.eta * (target - self.predict(xi))
                 self.w_[1:] += update * xi
@@ -58,3 +66,9 @@ plt.plot(range(1, len(ppn.errors_) + 1), ppn.errors_, marker='o')
 plt.xlabel('Epochs')
 plt.ylabel('Number of updates')
 plt.show()
+
+#lo scopo del progetto è quello di implementare un percettrone e studiarne il comportamento su un dataset di esempio.
+#Il dataset scelto è il dataset Iris, che contiene 150 esempi di fiori, divisi in 3 classi.
+#Per semplicità, si è scelto di considerare solo i primi 100 esempi, relativi alle prime due classi.
+#Il dataset contiene 4 features, ma per semplicità si è scelto di considerare solo le prime due.
+#I grafici mostrano la distribuzione dei dati e il numero di aggiornamenti dei pesi del percettrone per ogni epoca.
