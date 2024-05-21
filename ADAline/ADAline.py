@@ -10,6 +10,29 @@ from matplotlib.colors import ListedColormap
 # scalare tra il vettore di pesi e il vettore di input è maggiore di una soglia, il percettrone
 # classifica l'input come appartenente alla classe 1, altrimenti come appartenente alla classe -1.
 
+def plot_decision_regions(X, y, classifier, resolution=0.02):
+    # setup marker generator and color map
+    markers = ('s', 'x', 'o', '^', 'v')
+    colors = ('red', 'blue', 'lightgreen', 'gray', 'cyan')
+    cmap = ListedColormap(colors[:len(np.unique(y))])
+
+    # plot the decision surface
+    x1_min, x1_max = X[:, 0].min() - 1, X[:, 0].max() + 1
+    x2_min, x2_max = X[:, 1].min() - 1, X[:, 1].max() + 1
+    xx1, xx2 = np.meshgrid(np.arange(x1_min, x1_max, resolution),
+                           np.arange(x2_min, x2_max, resolution))
+    Z = classifier.predict(np.array([xx1.ravel(), xx2.ravel()]).T)
+    Z = Z.reshape(xx1.shape)
+    plt.contourf(xx1, xx2, Z, alpha=0.3, cmap=cmap)
+    plt.xlim(xx1.min(), xx1.max())
+    plt.ylim(xx2.min(), xx2.max())
+
+    # plot class samples
+    for idx, cl in enumerate(np.unique(y)):
+        plt.scatter(x=X[y == cl, 0], y=X[y == cl, 1],
+                    alpha=0.8, c=[cmap(idx)],
+                    marker=markers[idx], label=cl)
+
 class Adaline(object):
     def __init__(self, eta=0.01, n_iter=50, random_state=1):
         self.eta = eta
@@ -94,7 +117,8 @@ X_std[:, 1] = (X[:, 1] - X[:, 1].mean()) / X[:, 1].std()
 ada = Adaline(n_iter=15, eta=0.01)
 ada.fit(X_std, y)
 
-plt.plot(range(1, len(ada.cost_) + 1), ada.cost_, marker='o')
+# Plot decision regions
+plot_decision_regions(X_std, y, classifier=ada)
 plt.xlabel('Epochs')
 plt.ylabel('Sum-squared-error')
 plt.tight_layout()
